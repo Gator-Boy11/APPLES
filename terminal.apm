@@ -1,0 +1,9 @@
+[properties]
+name = terminal
+version = 0.1.0
+service = userInterface
+exclusive = no
+
+[order]
+before = []
+after = [{"plugin":"$core", "priority":0}]

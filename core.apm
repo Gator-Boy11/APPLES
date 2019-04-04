@@ -1,0 +1,10 @@
+[properties]
+name = core
+version = 0.1.0
+service = core
+exclusive = yes
+
+
+[order]
+before = []
+after = []
