@@ -67,6 +67,14 @@ Loads and processes APM files into usable forms
     if "order" in plugin:
         plugins[-1]["order"].update(plugin["order"])
 
+    try:
+        importlib.import_module(plugin["properties"]["name"]+".precheck")
+    except ModuleNotFoundError:
+        log("precheck not found for " + plugin["properties"]["name"])
+    except Exception as e:
+        log("precheck not found for " + plugin["properties"]["name"])
+        raise e
+
     #Process json
     plugins[-1]["order"]["before"] = json.loads(plugins[-1]["order"]["before"])
     plugins[-1]["order"]["after"] = json.loads(plugins[-1]["order"]["after"])

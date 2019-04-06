@@ -1,7 +1,7 @@
 [properties]
-name = terminal
-version = 0.2.0
-service = userInterface
+name = updater
+version = 0.1.0
+service = updater
 exclusive = no
 
 [order]
@@ -10,5 +10,5 @@ after = [{"plugin":"$core", "priority":0}]
 
 [updates]
 remoteroot = https://raw.githubusercontent.com/Gator-Boy11/APPLES/master/
-localroot = _APPLES_/
-files = [["terminal.apm", "terminal.apm"], ["terminal/__init__.py", "terminal/__init__.py"]]
+#localroot = _APPLES_/
+files = [["updater.apm", "updater.apm"], ["updater/__init__.py", "updater/__init__.py"]]
