@@ -67,7 +67,7 @@ Loads and processes APM files into usable forms
 
 def log(string, level=3, end="\n"):
     if level <= LOGLEVEL:
-        print(string)
+        print("[updater]: " + string, end = end)
 
 def findManifest(plugin):
     fileNum = None
@@ -99,6 +99,18 @@ def createURLs(local, remote, files):
 
 def update(local, remote):
     log("updating " + local["properties"]["name"])
+    localURLs = createURLs(local["updates"]["localroot"], local["updates"]["remoteroot"], local["updates"]["files"])
+    remoteURLs = createURLs(remote["updates"]["localroot"], remote["updates"]["remoteroot"], remote["updates"]["files"])
+
+    #Not sure how to handle local files. Should they be purged? Kept?
+    #Right now if you want them removed your program must do it itself.
+    #Also prechecks need to be identified, so this script isn't overwritten
+    #while it is currently running. It shouldn't matter because it should
+    #just be loaded into memory, but better safe than sorry.
+
+    for urlSet in remoteURLs:
+        urllib.request.urlretrieve(urlSet[1], urlSet[0])
+    
 
 #===============================================================================
 #   Prepare Environment
@@ -115,7 +127,7 @@ pathReplecements = {
 #===============================================================================
 #   Read Module Info
 #===============================================================================
-log("Identifying plugins...", end = " ")
+log("Identifying plugins to update...", end = " ")
 plugins = []
 for file in os.listdir(sys.path[0]):
     if os.path.isfile(os.path.join(sys.path[0], file)):
@@ -128,10 +140,9 @@ for plugin in plugins:
         urls = createURLs(plugin["updates"]["localroot"], plugin["updates"]["remoteroot"], plugin["updates"]["files"])
         man = findManifest(plugin)
 
-        localManifest = configparser.ConfigParser()
+
         remoteManifest = configparser.ConfigParser()
-        localManifest.read(urls[man][0])
-        localVer = localManifest["properties"]["version"].split(".")
+        localVer = plugin["properties"]["version"].split(".")
         for num in range(0, len(localVer)):
             localVer[num] = int(localVer[num])
 
@@ -147,7 +158,14 @@ for plugin in plugins:
                     elif int(remoteVer[num]) < localVer[num]:
                         break
                     else:
-                        update(localManifest, remoteManifest)
+                        remoteManifest = dict(remoteManifest.items())
+                        for i, j in remoteManifest.items():
+                            remoteManifest[i] = dict(j.items())
+                        if remoteManifest["updates"]["localroot"] != None:
+                            for key in pathReplecements.keys():
+                                remoteManifest["updates"]["localroot"] = remoteManifest["updates"]["localroot"].replace(key, pathReplecements[key])
+                        remoteManifest["updates"]["files"] = json.loads(remoteManifest["updates"]["files"])
+                        update(plugin, remoteManifest)
                 
             
      

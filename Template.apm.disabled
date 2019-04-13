@@ -1,7 +1,7 @@
 [properties]
-name = terminal
-version = 0.2.1
-service = userInterface
+name = Template
+version = 0.0.0
+service = Template
 exclusive = no
 
 [order]

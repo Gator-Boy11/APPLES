@@ -69,10 +69,12 @@ Loads and processes APM files into usable forms
 
     try:
         importlib.import_module(plugin["properties"]["name"]+".precheck")
+        #log("\nPre-flight check found for " + plugin["properties"]["name"] + " ", end = "")
     except ModuleNotFoundError:
-        log("precheck not found for " + plugin["properties"]["name"])
+        #log("precheck not found for " + plugin["properties"]["name"])
+        pass
     except Exception as e:
-        log("precheck not found for " + plugin["properties"]["name"])
+        log("Problem running precheck for " + plugin["properties"]["name"])
         raise e
 
     #Process json
@@ -81,7 +83,7 @@ Loads and processes APM files into usable forms
 
 def log(string, level=3, end="\n"):
     if level <= LOGLEVEL:
-        print(string)
+        print(string, end = end)
 
 
 
