@@ -105,4 +105,4 @@ venv.bak/
 
 
 # Apple instance Files
-.acf
+*.acf
