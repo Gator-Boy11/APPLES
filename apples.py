@@ -1,6 +1,6 @@
 #APPLES - Automatic Python Plugin Loading & Executing Script
 
-
+#Version 0.1.0
 
 
 
@@ -191,6 +191,12 @@ unsorted = True
 while unsorted:
     original = []
     for plugin in plugins:
+        for target in plugin["order"]["after"]:
+            if target["plugin"] == "^ALL":
+                for p in plugins:
+                    if p != plugin:
+                       plugin["order"]["after"].append({"plugin": p["properties"]["name"], "priority": target["priority"]})
+            del target
         original.append(plugin["properties"]["name"])
         
     for plugin in range(0,len(plugins)):

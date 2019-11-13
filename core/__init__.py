@@ -1,4 +1,4 @@
-import time, sys
+import time, sys, traceback
 
 
 
@@ -45,7 +45,10 @@ def eStop(): #eStop will close the program, so dont use it unless you mean it.
     unsafe()
     if not safetyCalled:
         for function in safetyFunctions:
-            function()
+            try:
+                function()
+            except Exception as e:
+                traceback.print_exc()
         safetyCalled = True
         raise EMERGENCYSTOP
     

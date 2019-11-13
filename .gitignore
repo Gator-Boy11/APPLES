@@ -107,3 +107,7 @@ venv.bak/
 # Apple instance Files
 *.acf
 *.arf
+
+# test certificate files
+*.crt
+*.key
