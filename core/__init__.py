@@ -85,9 +85,9 @@ def removeSanity(func): # already done
     sanityFunctions.remove(func)
 
 def addSafety(func):
-    global sanityFunctions
+    global safetyFunctions
     safetyCalled = False
-    sanityFunctions.append(func)
+    safetyFunctions.append(func)
 
 def removeSafety(func):
     global safetyFunctions
