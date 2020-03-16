@@ -1,0 +1,14 @@
+[properties]
+name = sslman
+version = 0.1.0
+service = sslManager
+exclusive = no
+
+[order]
+before = []
+after = [{"plugin":"$core", "priority":0}, {"plugin":"^ALL", "priority":0}]
+
+[updates]
+remoteroot = https://raw.githubusercontent.com/Gator-Boy11/APPLES/master/
+localroot = _APPLES_/
+files = [["plumber.apm", "plumber.apm"], ["plumber/__init__.py", "plumber/__init__.py"]]

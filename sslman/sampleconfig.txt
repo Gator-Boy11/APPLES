@@ -1,0 +1,28 @@
+{
+    "format": "0.1.0",
+    "serverSettings": [
+        {
+            "name": "testserver",
+            "addresses":[
+                ("", 47923),
+                ],
+            "queue": 5,
+            "addressTimeout": 1,
+            "serverCert": "hfh/server.crt",
+            "serverKey": "hfh/server.key",
+            "clientCerts": [
+                "hfh/client1.crt",
+                "hfh/client2.crt"]
+            },
+        ],
+    "clientSettings": [
+        {
+            "name": "testserver",
+            "serverAddress": ("127.0.0.1", 47923),
+            "serverCert": "hfh/server.crt",
+            "serverHostname": "gator-boy11.local",
+            "clientCert": "hfh/client1.crt",
+            "clientKey": "hfh/client1.key",
+            }
+        ],
+    }
