@@ -27,7 +27,7 @@ def _register_(serviceList, pluginProperties):
         "assist": assist,
         "estop": eStop,
         "emergency": eStop,
-        "stop": stop,
+        # "stop": stop,
         "exit": stop,
         "terminal": {
             "help": assist,
@@ -60,13 +60,13 @@ def loopTask():
             quotedCommand = []
             for section in range(0, len(rawCommand)):
                 if quoted:
-                    if rawCommand[section][-1] == '"':
-                        quoted = False
                     quotedCommand[-1] += " " + rawCommand[section]
                 else:
                     if rawCommand[section][0] == '"':
                         quoted = True
                     quotedCommand.append(rawCommand[section])
+                if rawCommand[section][-1] == '"':
+                    quoted = False
             rawCommand = quotedCommand
             for section in range(0, len(rawCommand)):
                 if rawCommand[section][0] == '"' \
