@@ -1,46 +1,50 @@
-import time, sys, traceback
+import time
+import sys
+import traceback
 
 
-
-
-
-#===============================================================================
+# =============================================================================
 #   Create Global Variables
-#===============================================================================
+# =============================================================================
 services = {}
 plugin = {}
 
 startFunctions = []
 loopFunctions = []
 closeFunctions = []
-sanityFunctions = [] #functions to be run at every possible opportunity in the main loop
-safetyFunctions = [] #functions to be run in the event of an estop, also called with unsafe
+sanityFunctions = []  # functions to be run at every possible opportunity in
+# the main loop
+safetyFunctions = []  # functions to be run in the event of an estop, also
+# called with unsafe
 
 loopOn = True
-safe = True #if this value becomes false, the program will end immediately once control is returned
+safe = True  # if this value becomes false, the program will end immediately
+# once control is returned to the core
 safetyCalled = False
 
 eStopSource = ""
 
 
-
-
-#===============================================================================
+# =============================================================================
 #   Define Pre-Run functions
-#===============================================================================
-class EMERGENCYSTOP(Exception): #Create a custom exception for my purposes
-    def __init__(self):    
+# =============================================================================
+class EMERGENCYSTOP(Exception):  # Create a custom exception for my purposes
+    def __init__(self):
         self.data = eStopSource
+
     def __str__(self):
         return repr(self.data)
 
+
 def _register_(serviceList, pluginProperties):
+    global services, plugin
     services = serviceList
     plugin = pluginProperties
     return True
 
-def eStop(): #eStop will close the program, so dont use it unless you mean it.
-    global safetyFunctions, safetyCalled
+
+def eStop():  # eStop will close the program, so dont use it unless you mean it
+    global safetyFunctions, safetyCalled, eStopSource
     eStopSource = sys._getframe().f_back.f_code.co_name
     unsafe()
     if not safetyCalled:
@@ -51,65 +55,76 @@ def eStop(): #eStop will close the program, so dont use it unless you mean it.
                 traceback.print_exc()
         safetyCalled = True
         raise EMERGENCYSTOP
-    
+
+
 def addStart(func):
     global startFunctions
     startFunctions.append(func)
 
+
 def removeStart(func):
     global startFunctions
     startFunctions.remove(func)
-    
+
+
 def addLoop(func):
     global loopFunctions
     loopFunctions.append(func)
+
 
 def removeLoop(func):
     global loopFunctions
     loopFunctions.remove(func)
 
+
 def addClose(func):
     global closeFunctions
     closeFunctions.append(func)
+
 
 def removeClose(func):
     global closeFunctions
     closeFunctions.remove(func)
 
-def addSanity(func): # I wish I could
+
+def addSanity(func):  # I wish I could
     global sanityFunctions
     sanityFunctions.append(func)
 
-def removeSanity(func): # already done
+
+def removeSanity(func):  # already done
     global sanityFunctions
     sanityFunctions.remove(func)
 
+
 def addSafety(func):
-    global safetyFunctions
+    global safetyFunctions, safetyCalled
     safetyCalled = False
     safetyFunctions.append(func)
+
 
 def removeSafety(func):
     global safetyFunctions
     safetyFunctions.remove(func)
 
+
 def stop():
     global loopOn
     loopOn = False
+
 
 def unsafe():
     global safe
     safe = False
 
 
-
-
-
-#===============================================================================
+# =============================================================================
 #   Define runtime function
-#===============================================================================
+# =============================================================================
 def _run_():
-    global safe, loopOn, startFunctions, loopFunctions, closeFunctions, sanityFunctions, safetyFunctions
+    global safe, loopOn
+    global startFunctions, loopFunctions, closeFunctions
+    global sanityFunctions, safetyFunctions
     try:
         for function in startFunctions:
             function()
@@ -122,7 +137,7 @@ def _run_():
                 while sf < len(sanityFunctions) and safe:
                     sanityFunctions[sf]()
                     sf += 1
-            if len(loopFunctions) > 0 and safe:
+            if len(loopFunctions) <= 0 and safe:
                 time.sleep(0.1)
         cf = 0
         while cf < len(closeFunctions) and safe:
@@ -136,4 +151,3 @@ def _run_():
     finally:
         if not safe:
             eStop()
-    

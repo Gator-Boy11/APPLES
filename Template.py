@@ -1,35 +1,39 @@
-import threading, time
+import threading
 
 services = {}
 plugin = {}
 core = None
-runThread = None
-threadActive = False
+run_thread = None
+thread_active = False
+
 
 def _register_(serviceList, pluginProperties):
     global services, plugin, core
     services = serviceList
     plugin = pluginProperties
     core = services["core"][0]
-    #core.addStart(startThread)
-    #core.addClose(closeThread)
-    #core.addLoop(loopTask)
+    # core.addStart(start_thread)
+    # core.addClose(close_thread)
+    # core.addLoop(loopTask)
+
 
 def loopTask():
     pass
 
-def startThread():
-    global runThread
-    threadActive = True
-    runThread = threading.Thread(target = threadScript)
-    runThread.start()
 
-def closeThread():
-    global runThread
-    threadActive = False
-    runThread.join()
+def start_thread():
+    global run_thread, thread_active
+    thread_active = True
+    run_thread = threading._thread(target=thread_script)
+    run_thread.start()
 
-def threadScript():
-    global threadActive
-    threadActive = False
-    
+
+def close_thread():
+    global run_thread, thread_active
+    thread_active = False
+    run_thread.join()
+
+
+def thread_script():
+    global thread_active
+    thread_active = False
