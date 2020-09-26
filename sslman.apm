@@ -9,6 +9,7 @@ before = []
 after = [{"plugin":"$core", "priority":0}, {"plugin":"^ALL", "priority":0}]
 
 [updates]
+format = 0.1.0
 remoteroot = https://raw.githubusercontent.com/Gator-Boy11/APPLES/master/
 localroot = _APPLES_/
-files = [["plumber.apm", "plumber.apm"], ["plumber/__init__.py", "plumber/__init__.py"]]
+files = ["plumber.apm", "plumber/__init__.py"]

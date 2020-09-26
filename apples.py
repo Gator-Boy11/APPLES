@@ -2,7 +2,7 @@
 
 # APPLES - Automatic Python Plugin Loading & Executing Script
 
-# Version 0.1.2
+# Version 0.1.3
 
 
 # =============================================================================
