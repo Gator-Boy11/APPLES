@@ -15,7 +15,7 @@ Loads and processes APM files into usable forms
 '''
     # Perform initial read
     plugin = configparser.ConfigParser()
-    plugin.read(file)
+    plugin.read_string(file.read().decode())
 
     # Convert to dictionary
     plugin = dict(plugin.items())
@@ -84,18 +84,24 @@ def download(plugin):
         remotes.append(get_remote_url(plugin, file_name))
         locals.append(get_local_url(plugin, file_name))
 
+    print(remotes, locals)
+
     for local, remote in zip(locals, remotes):
+        print(local, remote)
         urllib.request.urlretrieve(remote, local)
 
 
 def verify(plugin):
     for file_name in plugin["updates"]["files"]:
         local = get_local_url(plugin, file_name)
+        print(local)
         if not os.path.isfile(local):
             return False
     return True
 
 def update_plugin(plugin):
+    print(plugin)
     updated, plugin = check_for_new_manifest(plugin)
+    print(plugin)
     if updated or not verify(plugin):
         download(plugin)

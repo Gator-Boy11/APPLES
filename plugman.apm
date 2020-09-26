@@ -12,4 +12,4 @@ after = [{"plugin":"$core", "priority":0}]
 format = 0.1.0
 remoteroot = https://raw.githubusercontent.com/Gator-Boy11/APPLES/master/
 localroot = _APPLES_/
-files = ["plugman.apm", "plugman/__init__.py", "plugman/precheck.py", "plugman/update/handlers/__init__.py", "plugman/update/handlers/0_0_0.py", "plugman/update/handlers/0_1_0.py"]
+files = ["plugman.apm", "plugman/__init__.py", "plugman/precheck.py", "plugman/update_handlers/__init__.py", "plugman/update_handlers/0_0_0.py", "plugman/update_handlers/0_1_0.py"]

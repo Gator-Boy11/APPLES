@@ -76,15 +76,27 @@ def loadAPC(filepath):
                     getLocRem(entry["local"], entry["remote"])
                     plugin = configparser.ConfigParser()
                     plugin.read(replacePath(entry["local"]))
-                    for pluginDep in json.loads(plugin["updates"]["files"]):
-                        pluginDep[0] = plugin["updates"]["localroot"] + pluginDep[0]
-                        pluginDep[0] = replacePath(pluginDep[0])
-                        if not os.path.isfile(pluginDep[0]):
-                            pluginDep[1] = plugin["updates"]["remoteroot"] + pluginDep[1]
-                            filepath = pluginDep[0].rsplit("/", 1)[0]
-                            if not os.path.exists(filepath):
-                                os.makedirs(filepath)
-                            getLocRem(pluginDep[0], pluginDep[1])
+                    format = plugin["updates"].setdefault("format", "0.0.0")
+                    if format == "0.0.0":
+                        for pluginDep in json.loads(plugin["updates"]["files"]):
+                            pluginDep[0] = plugin["updates"]["localroot"] + pluginDep[0]
+                            pluginDep[0] = replacePath(pluginDep[0])
+                            if not os.path.isfile(pluginDep[0]):
+                                pluginDep[1] = plugin["updates"]["remoteroot"] + pluginDep[1]
+                                filepath = pluginDep[0].rsplit("/", 1)[0]
+                                if not os.path.exists(filepath):
+                                    os.makedirs(filepath)
+                                getLocRem(pluginDep[0], pluginDep[1])
+                    elif format == "0.1.0":
+                        for pluginDep in json.loads(plugin["updates"]["files"]):
+                            pluginDep = plugin["updates"]["localroot"] + pluginDep
+                            pluginDep = replacePath(pluginDep)
+                            if not os.path.isfile(pluginDep):
+                                pluginDep = plugin["updates"]["remoteroot"] + pluginDep
+                                filepath = pluginDep.rsplit("/", 1)
+                                if not os.path.exists(filepath):
+                                    os.makedirs(filepath)
+                                getLocRem(pluginDep, pluginDep)
 
             if entry["type"].lower() == "collection":
                 if not os.path.isfile(replacePath(entry["local"])):
