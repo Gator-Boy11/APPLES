@@ -1,6 +1,6 @@
 [properties]
 name = sslman
-version = 0.1.0
+version = 0.1.1
 service = sslManager
 exclusive = no
 
@@ -12,4 +12,4 @@ after = [{"plugin":"$core", "priority":0}, {"plugin":"^ALL", "priority":0}]
 format = 0.1.0
 remoteroot = https://raw.githubusercontent.com/Gator-Boy11/APPLES/master/
 localroot = _APPLES_/
-files = ["plumber.apm", "plumber/__init__.py"]
+files = ["sslman.apm", "sslman/__init__.py"]
