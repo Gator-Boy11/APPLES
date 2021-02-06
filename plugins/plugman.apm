@@ -1,10 +1,11 @@
 {
-    "version": "0.1.0",
+    "version": "0.1.1",
     "format": "0.1.0",
     "name": "plugman",
     "human-name": "Plugin Manager",
     "description": "Plugin manager and updater.",
     "service": "plugman",
+    "update-url": "https://raw.githubusercontent.com/The-Randalorian/APPLES/0.2.0-Refactor/plugins/plugman.apm",
     "requirements": [
     ],
     "load-directives": [

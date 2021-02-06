@@ -5,6 +5,7 @@
     "human-name": "Template",
     "description": "Template APM file",
     "service": "template",
+    "update-url": "https://raw.githubusercontent.com/The-Randalorian/APPLES/0.2.0-Refactor/plugins/template.apm",
     "requirements": [
     ],
     "load-directives": [

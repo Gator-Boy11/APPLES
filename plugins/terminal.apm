@@ -1,10 +1,11 @@
 {
-    "version": "0.1.0",
+    "version": "0.1.1",
     "format": "0.1.0",
     "name": "terminal",
     "human-name": "Terminal",
     "description": "Terminal handler.",
     "service": "terminal",
+    "update-url": "https://raw.githubusercontent.com/The-Randalorian/APPLES/0.2.0-Refactor/plugins/terminal.apm",
     "load-directives": [
         {
             "directive": "load-after",
