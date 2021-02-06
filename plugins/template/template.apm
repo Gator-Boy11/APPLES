@@ -16,11 +16,11 @@
     "files": [
         {
             "local-url": "plugins/templates.apm",
-            "remote-url": "https://raw.githubusercontent.com/The_Randalorian/APPLES/master/plugins/templates.apm"
+            "remote-url": "https://raw.githubusercontent.com/The_Randalorian/APPLES/master/plugins/template.apm"
         },
         {
             "local-url": "plugins/templates/__init__.py",
-            "remote-url": "https://raw.githubusercontent.com/The_Randalorian/APPLES/master/plugins/templates/__init__.py"
+            "remote-url": "https://raw.githubusercontent.com/The_Randalorian/APPLES/master/plugins/template/__init__.py"
         }
     ]
 }
