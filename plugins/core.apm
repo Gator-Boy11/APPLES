@@ -14,11 +14,11 @@
     "files": [
         {
             "local-url": "plugins/test.apm",
-            "remote-url": "https://raw.githubusercontent.com/The_Randalorian/APPLES/0.2.0-Refactor/plugins/core.apm"
+            "remote-url": "https://raw.githubusercontent.com/The-Randalorian/APPLES/0.2.0-Refactor/plugins/core.apm"
         },
         {
             "local-url": "plugins/test/__init__.py",
-            "remote-url": "https://raw.githubusercontent.com/The_Randalorian/APPLES/0.2.0-Refactor/plugins/core/__init__.py"
+            "remote-url": "https://raw.githubusercontent.com/The-Randalorian/APPLES/0.2.0-Refactor/plugins/core/__init__.py"
         }
     ]
 }

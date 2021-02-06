@@ -30,19 +30,19 @@
     "files": [
         {
             "local-url": "plugins/plugman.apm",
-            "remote-url": "https://raw.githubusercontent.com/The_Randalorian/APPLES/0.2.0-Refactor/plugins/plugman.apm"
+            "remote-url": "https://raw.githubusercontent.com/The-Randalorian/APPLES/0.2.0-Refactor/plugins/plugman.apm"
         },
         {
             "local-url": "plugins/plugman/__init__.py",
-            "remote-url": "https://raw.githubusercontent.com/The_Randalorian/APPLES/0.2.0-Refactor/plugins/plugman/__init__.py"
+            "remote-url": "https://raw.githubusercontent.com/The-Randalorian/APPLES/0.2.0-Refactor/plugins/plugman/__init__.py"
         },
         {
             "local-url": "plugins/plugman/handlers/__init__.py",
-            "remote-url": "https://raw.githubusercontent.com/The_Randalorian/APPLES/0.2.0-Refactor/plugins/plugman/handlers/__init__.py"
+            "remote-url": "https://raw.githubusercontent.com/The-Randalorian/APPLES/0.2.0-Refactor/plugins/plugman/handlers/__init__.py"
         },
         {
             "local-url": "plugins/plugman/handlers/apm/__init__.py",
-            "remote-url": "https://raw.githubusercontent.com/The_Randalorian/APPLES/0.2.0-Refactor/plugins/plugman/handlers/apm/__init__.py"
+            "remote-url": "https://raw.githubusercontent.com/The-Randalorian/APPLES/0.2.0-Refactor/plugins/plugman/handlers/apm/__init__.py"
         },
         {
             "local-url": "plugins/plugman/handlers/apm/f0_1_0.py",
