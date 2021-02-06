@@ -1,0 +1,24 @@
+{
+    "version": "0.1.0",
+    "format": "0.1.0",
+    "name": "core",
+    "human-name": "Core",
+    "description": "Core scheduler and entrypoint.",
+    "service": "core",
+    "load-directives": [
+        {
+            "directive": "load-deny",
+            "module": "$core"
+        }
+    ],
+    "files": [
+        {
+            "local-url": "plugins/test.apm",
+            "remote-url": "https://raw.githubusercontent.com/The_Randalorian/APPLES/0.2.0-Refactor/plugins/core.apm"
+        },
+        {
+            "local-url": "plugins/test/__init__.py",
+            "remote-url": "https://raw.githubusercontent.com/The_Randalorian/APPLES/0.2.0-Refactor/plugins/core/__init__.py"
+        }
+    ]
+}

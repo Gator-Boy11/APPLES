@@ -2,7 +2,7 @@
 
 # APPLES - Automatic Python Plugin Loading & Executing Script
 
-# Version 0.1.4
+# Version 0.2.0
 
 
 # =============================================================================
@@ -172,7 +172,7 @@ def log(string, level=3, end="\n"):
 os.chdir(sys.path[0])  # Set program directory
 pluginFileExtensions = {
     ".jpp": loadAPM,  # .jpp - JukePi Plugin (DEPRECATED)
-    ".apm": loadAPM,  # .apm - APPLES Plugin Manifest
+    ".apm": loadAPM,  # .apm - APPLES Plugin Manifest (DEPRECATED)
     }
 
 
