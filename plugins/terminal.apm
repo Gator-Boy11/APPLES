@@ -18,11 +18,11 @@
     ],
     "files": [
         {
-            "local-url": "plugins/templates.apm",
+            "local-url": "plugins/terminal.apm",
             "remote-url": "https://raw.githubusercontent.com/The-Randalorian/APPLES/0.2.0-Refactor/plugins/terminal.apm"
         },
         {
-            "local-url": "plugins/templates/__init__.py",
+            "local-url": "plugins/terminal/__init__.py",
             "remote-url": "https://raw.githubusercontent.com/The-Randalorian/APPLES/0.2.0-Refactor/plugins/terminal/__init__.py"
         }
     ]
