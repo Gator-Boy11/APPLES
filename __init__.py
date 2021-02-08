@@ -2,21 +2,20 @@
 
 # APPLES - Automatic Python Plugin Loading & Executing Script
 
-# Version 0.2.0
+# Version 0.2.1
 
 import os              # Library used for accessing basic os features.
-# import sys             # Library used for accessing core system features
 import importlib       # Library used for dynamically loading plugins.
-# import configparser    # Library used for reading library information
 import json             # Library used for reading plugin information.
-# import traceback       # Library used for getting error information
-# import urllib.request  # Library used for downloading files
-import copy            # Library used for copying info for ordering
+import urllib.request   # Library used for downloading files.
+import urllib.error
+import copy             # Library used for copying info for ordering.
 import logging          # Library used for logging.
-from types import ModuleType
+import shutil           # Library used for file management.
+import types            # Library used for type information.
 
 _logger = logging.getLogger(f"{__name__}")
-_plugins: ModuleType
+_plugins: types.ModuleType
 
 
 APPLE_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
@@ -80,13 +79,112 @@ def cleanup():
 ''')
 
 
+def _collection_type_file(collection_item):
+    local = os.path.join(APPLE_DIRECTORY, collection_item["local"])
+    try:
+        os.makedirs(os.path.dirname(local))
+    except FileExistsError:
+        pass
+    if not (os.path.exists(local) or os.path.exists(f"{local}.disabled")):
+        urllib.request.urlretrieve(collection_item["remote"], local)
+
+
+def _collection_type_plugin(collection_item):
+    local = os.path.join(PLUGIN_DIRECTORY, collection_item["local"])
+    try:
+        os.makedirs(os.path.dirname(local))
+    except FileExistsError:
+        pass
+    if not (os.path.exists(local) or os.path.exists(f"{local}.disabled")):
+        urllib.request.urlretrieve(collection_item["remote"], local)
+    manifests = []
+    f_type = os.path.splitext(local)[-1]
+    _manifest_handlers[f_type](local, manifests)
+    plugin_manifest = manifests[0]
+    for file in plugin_manifest["files"]:
+        local_url = os.path.join(APPLE_DIRECTORY, file["local-url"])
+        remote_url = file["remote-url"]
+        try:
+            os.makedirs(os.path.dirname(local_url))
+        except FileExistsError:
+            pass
+        if not (os.path.exists(local_url) or os.path.exists(f"{local_url}.disabled")):
+            urllib.request.urlretrieve(remote_url, local_url)
+
+
+_collection_types = {
+    "file": _collection_type_file,
+    "plugin": _collection_type_plugin
+}
+
+
+def _apc_loader(source_file):
+    _logger.info(f"Loading collection {source_file}.")
+    with open(source_file, "r") as collection_file:
+        collection = json.load(collection_file)
+        collection = _apc_json_handlers[collection["format"]](collection)
+    collection_human_name = collection["human-name"]
+    _logger.info(f"Loaded collection {collection_human_name}. ({source_file})")
+    return collection
+
+
+def _apc_handler(source_file):
+    collection = _apc_loader(source_file)
+    collection_human_name = collection["human-name"]
+
+    collection_remote_url = collection["update-url"]
+    try:
+        with urllib.request.urlopen(collection_remote_url) as remote_collection_file:
+            with open(source_file, "wb") as collection_file:
+                shutil.copyfileobj(remote_collection_file, collection_file)
+            collection = _apc_loader(source_file)
+            collection_human_name = collection["human-name"]
+    except urllib.error.HTTPError:
+        pass
+    _logger.info(f"Processing collection {collection_human_name}. ({source_file})")
+    for collection_item in collection["collection"]:
+        _collection_types[collection_item["type"]](collection_item)
+    _logger.info(f"Processed collection {collection_human_name}. ({source_file})")
+
+
+def _parse_apc_json_0_2_0(collection):
+    collection_human_name = collection.get("human-name", None)
+    if collection_human_name is None:
+        collection_human_name = collection["name"]
+        _logger.warning(f"No human name found for {collection_human_name}. Using collection name.")
+    _logger.debug(f"Detected collection format 0.2.0 for {collection_human_name}.")
+    c = {
+        "human-name": collection_human_name,
+    }
+    c.update(collection)
+    return c
+
+
+_apc_json_handlers = {
+    "0.2.0": _parse_apc_json_0_2_0
+}
+
+_collection_handlers = {
+    ".apc": _apc_handler
+}
+
+
+def _load_collections(collection_data):
+    _logger.info("Loading plugin collections.")
+    for filename in os.listdir(COLLECTION_DIRECTORY):
+        for f_type in _collection_handlers.keys():
+            if filename.endswith(f_type):
+                _collection_handlers[f_type](os.path.join(COLLECTION_DIRECTORY, filename))
+    _logger.info("Loaded plugin collections.")
+
+
 def _apm_handler(source_file, manifests):
     _logger.info(f"Loading manifest {source_file}.")
     with open(source_file, "r") as plugin_manifest_file:
         plugin_manifest = json.load(plugin_manifest_file)
         plugin_manifest = _apm_json_handlers[plugin_manifest["format"]](plugin_manifest)
         manifests.append(plugin_manifest)
-    plugin_human_name = plugin_manifest["name"]
+    plugin_human_name = plugin_manifest["human-name"]
     _logger.info(f"Loaded manifest for {plugin_human_name}. ({source_file})")
 
 
@@ -110,8 +208,8 @@ _apm_json_handlers = {
     "0.1.0": _parse_apm_json_0_1_0
 }
 
-_file_handlers = {
-    ".apm": _apm_handler,
+_manifest_handlers = {
+    ".apm": _apm_handler
 }
 
 
@@ -120,9 +218,9 @@ def _load_plugin_manifests(plugin_data):
 
     _logger.info("Loading plugin manifests.")
     for filename in os.listdir(PLUGIN_DIRECTORY):
-        for f_type in _file_handlers.keys():
+        for f_type in _manifest_handlers.keys():
             if filename.endswith(f_type): 
-                _file_handlers[f_type](os.path.join(PLUGIN_DIRECTORY, filename), manifests)
+                _manifest_handlers[f_type](os.path.join(PLUGIN_DIRECTORY, filename), manifests)
     _logger.info("Loaded plugin manifests.")
 
     for manifest in manifests:
@@ -269,6 +367,7 @@ def init():
     global _plugins
     plugin_data = {}
     _setup_directories()
+    _load_collections(plugin_data)
     _load_plugin_manifests(plugin_data)
     _plugins = plugins = _load_plugins(plugin_data)
     return plugins
