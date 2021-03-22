@@ -18,14 +18,11 @@ plugin_data = {}
 
 def setup():
     _logger.warn("No setup function provided by any plugins.")
-    
-    
+
+
 def loop():
     _logger.critical("No loop function provided by any plugins.")
     raise Exception("No loop function provided by any plugins.")
-    
+
 def cleanup():
     _logger.warn("No cleanup function provided by any plugins.")
-
-def foo(bar):
-    return bar + bar
