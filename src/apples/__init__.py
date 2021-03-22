@@ -2,21 +2,20 @@
 
 # APPLES - Automatic Python Plugin Loading & Executing Script
 
-# Version 0.2.1
+# Version 0.2.2
 
-import os              # Library used for accessing basic os features.
-import importlib       # Library used for dynamically loading plugins.
-import json             # Library used for reading plugin information.
-import urllib.request   # Library used for downloading files.
+import os  # Library used for accessing basic os features.
+import importlib  # Library used for dynamically loading plugins.
+import json  # Library used for reading plugin information.
+import urllib.request  # Library used for downloading files.
 import urllib.error
-import copy             # Library used for copying info for ordering.
-import logging          # Library used for logging.
-import shutil           # Library used for file management.
-import types            # Library used for type information.
+import copy  # Library used for copying info for ordering.
+import logging  # Library used for logging.
+import shutil  # Library used for file management.
+import types  # Library used for type information.
 
 _logger = logging.getLogger(f"{__name__}")
 _plugins: types.ModuleType
-
 
 APPLE_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 PLUGIN_DIRECTORY = APPLE_DIRECTORY + os.sep + "plugins"
@@ -68,12 +67,12 @@ plugin_data = {}
 
 def setup():
     _logger.warn("No setup function provided by any plugins.")
-    
-    
+
+
 def loop():
     _logger.critical("No loop function provided by any plugins.")
     raise Exception("No loop function provided by any plugins.")
-    
+
 def cleanup():
     _logger.warn("No cleanup function provided by any plugins.")
 ''')
@@ -190,12 +189,17 @@ def _apm_handler(source_file, manifests):
 
 def _parse_apm_json_0_1_0(plugin_manifest):
     plugin_human_name = plugin_manifest.get("human-name", None)
+    plugin_service = plugin_manifest.get("service", None)
     if plugin_human_name is None:
         plugin_human_name = plugin_manifest["name"]
         _logger.warning(f"No human name found for {plugin_human_name}. Using module name.")
+    if plugin_service is None:
+        plugin_service = plugin_manifest["name"]
+        _logger.warning(f"No service name found for {plugin_human_name}. Using module name.")
     _logger.debug(f"Detected manifest format 0.1.0 for {plugin_human_name}.")
     p_m = {
         "human-name": plugin_human_name,
+        "service": plugin_service,
         "requirements": [],
         "load-directives": [],
         "files": [],
@@ -219,7 +223,7 @@ def _load_plugin_manifests(plugin_data):
     _logger.info("Loading plugin manifests.")
     for filename in os.listdir(PLUGIN_DIRECTORY):
         for f_type in _manifest_handlers.keys():
-            if filename.endswith(f_type): 
+            if filename.endswith(f_type):
                 _manifest_handlers[f_type](os.path.join(PLUGIN_DIRECTORY, filename), manifests)
     _logger.info("Loaded plugin manifests.")
 
@@ -314,7 +318,7 @@ _load_directives = {
 def _load_plugin(plugin_entry, plugins):
     plugin_name = plugin_entry["name"]
     plugin_human_name = plugin_entry["human-name"]
-    plugin_service = plugin_entry["name"]
+    plugin_service = plugin_entry["service"]
     _logger.info(f"Loading {plugin_human_name}.")
     plugin_module = importlib.import_module(f".plugins.{plugin_name}", package=__package__)
     _logger.info(f"Loaded {plugin_human_name}.")

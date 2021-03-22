@@ -26,3 +26,6 @@ def loop():
     
 def cleanup():
     _logger.warn("No cleanup function provided by any plugins.")
+
+def foo(bar):
+    return bar + bar
