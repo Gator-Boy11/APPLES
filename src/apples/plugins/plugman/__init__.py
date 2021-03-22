@@ -22,7 +22,7 @@ def update(plugin_list: str, repository=None, **_):
         if len(plugin_list) <= 0:
             plugin_list = list(plugins.plugin_data.keys())
         for plugin_name in plugin_list:
-            handlers.update(plugin_name, plugins.plugin_data[plugin], repository)
+            handlers.update(plugin_name, plugins.plugin_data[plugin_name], repository)
     else:
         _logger.error("Installing from repositories is not supported at this time.")
 
