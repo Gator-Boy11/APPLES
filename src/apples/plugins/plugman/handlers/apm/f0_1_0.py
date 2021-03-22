@@ -1,7 +1,7 @@
 import urllib.request
 import os
 
-from src.apples import plugins
+from ..... import plugins
 
 APPLE_DIRECTORY = plugins.APPLE_DIRECTORY
 PLUGIN_DIRECTORY = plugins.PLUGIN_DIRECTORY
