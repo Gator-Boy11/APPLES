@@ -2,7 +2,7 @@
 
 # APPLES - Automatic Python Plugin Loading & Executing Script
 
-# Version 0.2.2
+# Version 0.3.0
 
 import os  # Library used for accessing basic os features.
 import importlib  # Library used for dynamically loading plugins.
@@ -47,73 +47,71 @@ def _setup_directories():
     _make_folder(PLUGIN_DIRECTORY)
     _make_folder(COLLECTION_DIRECTORY)
     with open(PLUGIN_DIRECTORY + os.sep + "__init__.py", "w") as initfile:
-        initfile.write('''#!/usr/bin/env python3
-import os
-import typing
-import logging
+        initfile.write('#!/usr/bin/env python3\n'
+                       'import os\n'
+                       'import typing\n'
+                       'import logging\n'
+                       '\n'
+                       'APPLE_DIRECTORY = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))\n'
+                       'PLUGIN_DIRECTORY = APPLE_DIRECTORY + os.sep + "plugins"\n'
+                       'COLLECTION_DIRECTORY = APPLE_DIRECTORY + os.sep + "collections"\n'
+                       '\n'
+                       'ApplesExit: typing.NewType(\'ApplesExit\', Exception)\n'
+                       '\n'
+                       '_logger = logging.getLogger(f"{__name__}")\n'
+                       '\n'
+                       'plugins = {}\n'
+                       'services = {}\n'
+                       'plugin_data = {}\n'
+                       '\n'
+                       '\n'
+                       'def setup():\n'
+                       '    _logger.warning("No setup function provided by any plugins.")\n'
+                       '\n'
+                       '\n'
+                       'def loop():\n'
+                       '    _logger.critical("No loop function provided by any plugins.")\n'
+                       '    raise Exception("No loop function provided by any plugins.")\n'
+                       '\n'
+                       '\n'
+                       'def cleanup():\n'
+                       '    _logger.warning("No cleanup function provided by any plugins.")\n'
+                       '')
 
-APPLE_DIRECTORY = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-PLUGIN_DIRECTORY = APPLE_DIRECTORY + os.sep + "plugins"
-COLLECTION_DIRECTORY = APPLE_DIRECTORY + os.sep + "collections"
 
-ApplesExit: typing.NewType('ApplesExit', Exception)
-
-_logger = logging.getLogger(f"{__name__}")
-
-plugins = {}
-services = {}
-plugin_data = {}
-
-
-def setup():
-    _logger.warn("No setup function provided by any plugins.")
-
-
-def loop():
-    _logger.critical("No loop function provided by any plugins.")
-    raise Exception("No loop function provided by any plugins.")
-
-def cleanup():
-    _logger.warn("No cleanup function provided by any plugins.")
-''')
+def _download(root_directory, local, remote):
+    local = os.path.join(root_directory, local)
+    _make_folder(os.path.dirname(local))
+    if not (os.path.exists(local) or os.path.exists(f"{local}.disabled")):
+        urllib.request.urlretrieve(remote, local)
+        return True
+    return False
 
 
 def _collection_type_file(collection_item):
-    local = os.path.join(APPLE_DIRECTORY, collection_item["local"])
-    try:
-        os.makedirs(os.path.dirname(local))
-    except FileExistsError:
-        pass
-    if not (os.path.exists(local) or os.path.exists(f"{local}.disabled")):
-        urllib.request.urlretrieve(collection_item["remote"], local)
+    _download(APPLE_DIRECTORY, collection_item["local"], collection_item["remote"])
 
 
 def _collection_type_plugin(collection_item):
+    _download(PLUGIN_DIRECTORY, collection_item["local"], collection_item["remote"])
     local = os.path.join(PLUGIN_DIRECTORY, collection_item["local"])
-    try:
-        os.makedirs(os.path.dirname(local))
-    except FileExistsError:
-        pass
-    if not (os.path.exists(local) or os.path.exists(f"{local}.disabled")):
-        urllib.request.urlretrieve(collection_item["remote"], local)
     manifests = []
     f_type = os.path.splitext(local)[-1]
     _manifest_handlers[f_type](local, manifests)
     plugin_manifest = manifests[0]
     for file in plugin_manifest["files"]:
-        local_url = os.path.join(APPLE_DIRECTORY, file["local-url"])
-        remote_url = file["remote-url"]
-        try:
-            os.makedirs(os.path.dirname(local_url))
-        except FileExistsError:
-            pass
-        if not (os.path.exists(local_url) or os.path.exists(f"{local_url}.disabled")):
-            urllib.request.urlretrieve(remote_url, local_url)
+        _download(APPLE_DIRECTORY, file["local-url"], file["remote-url"])
+
+
+def _collection_type_collection(collection_item):
+    downloaded = _download(COLLECTION_DIRECTORY, collection_item["local"], collection_item["remote"])
+    return downloaded
 
 
 _collection_types = {
     "file": _collection_type_file,
-    "plugin": _collection_type_plugin
+    "plugin": _collection_type_plugin,
+    "collection": _collection_type_collection
 }
 
 
@@ -128,6 +126,8 @@ def _apc_loader(source_file):
 
 
 def _apc_handler(source_file):
+    need_reload = False
+
     collection = _apc_loader(source_file)
     collection_human_name = collection["human-name"]
 
@@ -142,8 +142,10 @@ def _apc_handler(source_file):
         pass
     _logger.info(f"Processing collection {collection_human_name}. ({source_file})")
     for collection_item in collection["collection"]:
-        _collection_types[collection_item["type"]](collection_item)
+        need_reload = need_reload or bool(_collection_types[collection_item["type"]](collection_item))
     _logger.info(f"Processed collection {collection_human_name}. ({source_file})")
+
+    return need_reload
 
 
 def _parse_apc_json_0_2_0(collection):
@@ -168,12 +170,16 @@ _collection_handlers = {
 }
 
 
-def _load_collections(collection_data):
+def _load_collections():
     _logger.info("Loading plugin collections.")
-    for filename in os.listdir(COLLECTION_DIRECTORY):
-        for f_type in _collection_handlers.keys():
-            if filename.endswith(f_type):
-                _collection_handlers[f_type](os.path.join(COLLECTION_DIRECTORY, filename))
+    need_reload = True
+    while need_reload:
+        need_reload = False
+        for filename in os.listdir(COLLECTION_DIRECTORY):
+            for f_type in _collection_handlers.keys():
+                if filename.endswith(f_type):
+                    need_reload = need_reload or _collection_handlers[f_type](os.path.join(COLLECTION_DIRECTORY,
+                                                                                           filename))
     _logger.info("Loaded plugin collections.")
 
 
@@ -371,7 +377,7 @@ def init():
     global _plugins
     plugin_data = {}
     _setup_directories()
-    _load_collections(plugin_data)
+    _load_collections()
     _load_plugin_manifests(plugin_data)
     _plugins = plugins = _load_plugins(plugin_data)
     return plugins

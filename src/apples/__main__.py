@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+from time import gmtime, strftime
 
 try:
     from .. import apples
@@ -20,10 +21,16 @@ if __name__ == "__main__":
                         "--loglevel",
                         default="warning",
                         help="Provide logging level. Example --loglevel debug, default=warning")
+    parser.add_argument("-logfile",
+                        "--logfile",
+                        default=__file__[:-11] + "apples.log",
+                        help="Provide logfile URL. Example --logfile apples.log, default=(empty)")
 
     args = parser.parse_args()
-    logging.basicConfig(level=args.loglevel.upper())
+    logging.basicConfig(filename=args.logfile, filemode="w", level=args.loglevel.upper())
+    logging.getLogger().addHandler(logging.StreamHandler())
     logging.info(f"Loglevel set to {args.loglevel.upper()}.")
+    logging.info(f"Log file set to {args.logfile}.")
 
     apples.init()
 

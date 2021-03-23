@@ -19,5 +19,5 @@ def install_files(plugin_manifest):
             os.makedirs(os.path.dirname(local_url))
         except FileExistsError:
             pass
-        print(remote_url, local_url)
+        print(f"Getting {remote_url}")
         urllib.request.urlretrieve(remote_url, local_url)
